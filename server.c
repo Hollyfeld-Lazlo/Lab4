@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <strings.h>
+#include <string.h>
 
 #define MAXLINE 256
 typedef struct sockaddr SA; 
@@ -13,7 +14,8 @@ struct sockaddr_in serverAddr, clientAddr;
 int main(int argc, char *argv[]){
 	
 	int listenerFD, newSocketFD, portNO, clientLen;			
-	int count, header;
+	int count;
+	short header;
 	char buffer[256];
 	
 	if (argc < 2){
@@ -39,16 +41,16 @@ int main(int argc, char *argv[]){
 	printf("Listening on port %d\n", portNO);
 	clientLen = sizeof(clientAddr);
 	
-	while(1){
-		
+	while(1){	
 		newSocketFD = accept(listenerFD, (SA*)&clientAddr, &clientLen);
 		if (newSocketFD < 0)
 			perror("Error accepting...\n");
 	
-		printf("Listening on port %d\n", portNO);
 		bzero(buffer, MAXLINE);
 		
-		count = read(newSocketFD, &header , sizeof(header));  
+		count = read(newSocketFD, header , sizeof(header));  
+		header = ntohs(header);
+		printf("%d...\n", header);
 		if (count < 0)
 			perror("Error reading from client...\n");
 		
